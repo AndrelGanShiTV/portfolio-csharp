@@ -1,0 +1,17 @@
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\bin\Debug\net10.0\Portfolio.Infrastructure.deps.json
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\bin\Debug\net10.0\Portfolio.Infrastructure.dll
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\bin\Debug\net10.0\Portfolio.Infrastructure.pdb
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\bin\Debug\net10.0\Portfolio.Application.dll
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\bin\Debug\net10.0\Portfolio.Domain.dll
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\bin\Debug\net10.0\Portfolio.Domain.pdb
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\bin\Debug\net10.0\Portfolio.Application.pdb
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfolio.Infrastructure.csproj.AssemblyReference.cache
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfolio.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfolio.Infrastructure.AssemblyInfoInputs.cache
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfolio.Infrastructure.AssemblyInfo.cs
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfolio.Infrastructure.csproj.CoreCompileInputs.cache
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfoli.D1057275.Up2Date
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfolio.Infrastructure.dll
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\refint\Portfolio.Infrastructure.dll
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\Portfolio.Infrastructure.pdb
+D:\DotnetProjects\Portfolio\src\Portfolio.Infrastructure\obj\Debug\net10.0\ref\Portfolio.Infrastructure.dll
