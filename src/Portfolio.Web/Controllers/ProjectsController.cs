@@ -6,6 +6,8 @@ namespace Portfolio.Web.Controllers;
 
 public class ProjectsController : Controller
 {
+
+    [HttpGet("/projects")]
     public IActionResult Index()
     {
         return View();
