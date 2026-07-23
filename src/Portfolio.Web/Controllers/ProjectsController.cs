@@ -1,67 +1,59 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Portfolio.Web.Models;
 using Portfolio.Web.ViewModels.Projects;
+using Portfolio.Application.Services;
 
 namespace Portfolio.Web.Controllers;
 
 public class ProjectsController : Controller
 {
+    private readonly IProjectService _projectService;
+
+    public ProjectsController(IProjectService projectService)
+    {
+        _projectService = projectService;
+    }
 
     [HttpGet("/projects")]
     public IActionResult Index()
     {
-        var projects = new List<ProjectCardViewModel>
-        {
-            new()
+
+        var projects = _projectService.GetAll();
+
+        var viewModels = projects.Select(project =>
+            new ProjectCardViewModel
             {
-                Id = 1,
-                Name = "Sistema de Gestión de Proyectos Sociales",
-                Description =
-                    "Aplicación para administrar proyectos, actividades y participantes.",
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                RepositoryUrl = project.RepositoryUrl,
+                DemoUrl = project.DemoUrl,
+                Technologies = []
+            });
 
-                RepositoryUrl = "https://github.com/",
-                Technologies = ["C#", "ASP.NET Core", "SQL Server"]
-            },
-
-            new()
-            {
-                Id = 2,
-                Name = "API de Seguimiento",
-                Description =
-                    "API REST para consultar y actualizar información de seguimiento.",
-
-                RepositoryUrl = "https://github.com/",
-                Technologies = ["C#", "ASP.NET Core", "REST"]
-            },
-
-            new()
-            {
-                Id = 3,
-                Name = "Dashboard de Indicadores",
-                Description =
-                    "Panel para visualizar indicadores y resultados de proyectos.",
-
-                Technologies = ["C#", "Razor", "Bootstrap"]
-            }
-        };
-        return View(projects);
+        return View(viewModels);
     }
 
     [HttpGet("/projects/{id:int}")]
     public IActionResult Details(int id)
     {
-        var project = new ProjectCardViewModel
+        var project = _projectService.GetById(id);
+
+        if (project is null)
         {
-            Id = id,
-            Name = "Sistema de Gestión de Proyectos Sociales",
-            Description =
-                "Aplicación para administrar proyectos, actividades y participantes.",
-            RepositoryUrl = "https://github.com/",
-            Technologies = ["C#", "ASP.NET Core", "SQL Server"]
+            return NotFound();
+        }
+
+        var viewModel = new ProjectCardViewModel
+        {
+            Id = project.Id,
+            Name = project.Name,
+            Description = project.Description,
+            RepositoryUrl = project.RepositoryUrl,
+            DemoUrl = project.DemoUrl,
+            Technologies = []
         };
 
-        return View(project);
+        return View(viewModel);
     }
 
 }
