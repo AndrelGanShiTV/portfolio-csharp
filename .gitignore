@@ -1,0 +1,33 @@
+# Build results
+bin/
+obj/
+
+# Test results
+TestResults/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# VS Code
+.vscode/
+
+# JetBrains Rider
+.idea/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local databases
+*.db
+*.db-shm
+*.db-wal
+
+# Environment / secrets
+.env
+appsettings.Development.local.json
