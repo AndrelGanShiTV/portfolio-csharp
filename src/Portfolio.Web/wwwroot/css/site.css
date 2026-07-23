@@ -19,6 +19,22 @@ html {
 
 body {
   margin-bottom: 60px;
+  min-height: 100vh;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.08);
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
