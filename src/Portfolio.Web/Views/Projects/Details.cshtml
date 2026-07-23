@@ -1,0 +1,38 @@
+@model ProjectCardViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container py-5">
+
+    <a asp-controller="Projects" asp-action="Index" class="text-decoration-none">
+
+        ← Volver a proyectos
+
+    </a>
+
+    <div class="mt-4">
+
+        <h1 class="display-5 fw-bold">
+            @Model.Name
+        </h1>
+
+        <p class="lead mt-4">
+            @Model.Description
+        </p>
+
+        <div class="mt-4">
+
+            @foreach (var technology in Model.Technologies)
+            {
+                <span class="badge text-bg-secondary me-1">
+                    @technology
+                </span>
+            }
+
+        </div>
+
+    </div>
+
+</div>

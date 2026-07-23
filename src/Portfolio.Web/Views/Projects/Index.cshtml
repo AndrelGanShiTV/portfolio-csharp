@@ -1,3 +1,5 @@
+@model IEnumerable<ProjectCardViewModel>
+
 @{
     ViewData["Title"] = "Proyectos";
 }
@@ -5,7 +7,6 @@
 <div class="container py-5">
 
     <div class="mb-5">
-
         <h1 class="display-5 fw-bold">
             Mis proyectos
         </h1>
@@ -13,39 +14,71 @@
         <p class="lead">
             Algunos proyectos y soluciones en los que he trabajado.
         </p>
-
     </div>
 
     <div class="row g-4">
 
-        <div class="col-md-6 col-lg-4">
+        @foreach (var project in Model)
+        {
+            <div class="col-md-6 col-lg-4">
 
-            <div class="card h-100">
+                <div class="card h-100">
 
-                <div class="card-body">
+                    <div class="card-body d-flex flex-column">
 
-                    <h5 class="card-title">
-                        Sistema de Gestión
-                    </h5>
+                        <h5 class="card-title">
+                            @project.Name
+                        </h5>
 
-                    <p class="card-text">
-                        Aplicación desarrollada para gestionar
-                        información y procesos.
-                    </p>
+                        <p class="card-text">
+                            @project.Description
+                        </p>
 
-                    <span class="badge text-bg-dark">
-                        C#
-                    </span>
+                        <div class="mb-3">
 
-                    <span class="badge text-bg-primary">
-                        ASP.NET Core
-                    </span>
+                            @foreach (var technology in project.Technologies)
+                            {
+                                <span class="badge text-bg-secondary me-1">
+                                    @technology
+                                </span>
+                            }
+
+                        </div>
+
+                        <div class="mt-auto">
+
+                            @if (!string.IsNullOrWhiteSpace(project.RepositoryUrl))
+                            {
+                                <a href="@project.RepositoryUrl" class="btn btn-outline-dark" target="_blank">
+
+                                    Repositorio
+
+                                </a>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(project.DemoUrl))
+                            {
+                                <a href="@project.DemoUrl" class="btn btn-primary" target="_blank">
+
+                                    Demo
+
+                                </a>
+                            }
+                            <a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id"
+                               class="btn btn-primary">
+
+                                Ver proyecto
+
+                            </a>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
             </div>
-
-        </div>
+        }
 
     </div>
 

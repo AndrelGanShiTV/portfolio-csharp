@@ -28,7 +28,6 @@ D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\rjsmcshtml.dswa.
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\scopedcss\bundle\Portfolio.Web.styles.css
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\scopedcss\projectbundle\Portfolio.Web.bundle.scp.css
-D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\compressed\f0r7fkwxlp-{0}-b9sayid5wm-b9sayid5wm.gz
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\compressed\vdvnev2eyb-{0}-61n19gt1b8-61n19gt1b8.gz
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\compressed\yu36e32faw-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\compressed\0d7fwb350c-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -103,3 +102,4 @@ D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\refint\Portfolio
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\Portfolio.Web.pdb
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\Portfolio.Web.genruntimeconfig.cache
 D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\ref\Portfolio.Web.dll
+D:\DotnetProjects\Portfolio\src\Portfolio.Web\obj\Debug\net10.0\compressed\f0r7fkwxlp-{0}-rb9tt1oo0f-rb9tt1oo0f.gz
