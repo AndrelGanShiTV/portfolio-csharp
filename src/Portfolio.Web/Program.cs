@@ -2,6 +2,7 @@ using Portfolio.Application.Services;
 using Portfolio.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString(
             "DefaultConnection")));
 
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/account/login";
+});
+
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
 var app = builder.Build();
@@ -21,9 +32,22 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context =
-        scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        scope.ServiceProvider
+            .GetRequiredService<AppDbContext>();
 
-    await DbSeeder.SeedAsync(context);
+    var userManager =
+        scope.ServiceProvider
+            .GetRequiredService<UserManager<ApplicationUser>>();
+
+    var roleManager =
+        scope.ServiceProvider
+            .GetRequiredService<RoleManager<IdentityRole>>();
+
+    await DbSeeder.SeedAsync(
+        context,
+        userManager,
+        roleManager,
+        builder.Configuration);
 }
 
 // Configure the HTTP request pipeline.
@@ -37,9 +61,14 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

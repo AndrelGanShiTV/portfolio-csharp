@@ -1,0 +1,44 @@
+@model IEnumerable<ProjectCardViewModel>
+
+@{
+    ViewData["Title"] = "Administrar proyectos";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between mb-4">
+        <h1>Administrar proyectos</h1>
+
+        <a asp-area="Admin" asp-controller="Projects" asp-action="Create" class="btn btn-primary">
+            Nuevo proyecto
+        </a>
+
+        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit" class="btn btn-outline-danger">
+                Cerrar sesión
+            </button>
+        </form>
+    </div>
+
+    @foreach (var project in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+
+                <h5>@project.Name</h5>
+
+                <a asp-area="Admin" asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id"
+                   class="btn btn-warning">
+                    Editar
+                </a>
+
+                <a asp-area="Admin" asp-controller="Projects" asp-action="Delete" asp-route-id="@project.Id"
+                   class="btn btn-danger">
+                    Eliminar
+                </a>
+
+            </div>
+        </div>
+    }
+
+</div>

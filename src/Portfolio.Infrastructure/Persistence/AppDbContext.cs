@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Portfolio.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppDbContext(
         DbContextOptions<AppDbContext> options)
