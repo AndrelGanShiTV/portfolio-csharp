@@ -17,6 +17,8 @@ public class ProjectService : IProjectService
     public async Task<IEnumerable<Project>> GetAllAsync()
     {
         return await _context.Projects
+            .Include(project => project.ProjectSkills)
+            .ThenInclude(projectSkill => projectSkill.Skill)
             .Where(project => project.IsPublished)
             .ToListAsync();
     }
@@ -24,6 +26,8 @@ public class ProjectService : IProjectService
     public async Task<Project?> GetByIdAsync(int id)
     {
         return await _context.Projects
+            .Include(project => project.ProjectSkills)
+            .ThenInclude(projectSkill => projectSkill.Skill)
             .FirstOrDefaultAsync(project =>
                 project.Id == id &&
                 project.IsPublished);

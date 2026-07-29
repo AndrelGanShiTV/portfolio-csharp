@@ -13,4 +13,7 @@ public class Project
     public string? DemoUrl { get; set; }
 
     public bool IsPublished { get; set; }
+
+    public ICollection<ProjectSkill> ProjectSkills { get; set; }
+    = new List<ProjectSkill>();
 }

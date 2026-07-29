@@ -27,7 +27,9 @@ public class ProjectsController : Controller
                 Description = project.Description,
                 RepositoryUrl = project.RepositoryUrl,
                 DemoUrl = project.DemoUrl,
-                Technologies = []
+                Technologies = project.ProjectSkills
+                    .Select(projectSkill => projectSkill.Skill.Name)
+                    .ToList()
             });
 
         return View(viewModels);
@@ -50,7 +52,9 @@ public class ProjectsController : Controller
             Description = project.Description,
             RepositoryUrl = project.RepositoryUrl,
             DemoUrl = project.DemoUrl,
-            Technologies = []
+            Technologies = project.ProjectSkills
+                .Select(projectSkill => projectSkill.Skill.Name)
+                .ToList()
         };
 
         return View(viewModel);

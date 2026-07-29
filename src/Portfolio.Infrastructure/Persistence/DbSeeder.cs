@@ -12,36 +12,40 @@ public static class DbSeeder
             return;
         }
 
-        var projects = new List<Project>
+        var csharp = new Skill { Name = "C#" };
+        var aspNet = new Skill { Name = "ASP.NET Core" };
+        var sqlite = new Skill { Name = "SQLite" };
+        var rest = new Skill { Name = "REST" };
+
+        var project1 = new Project
         {
-            new()
-            {
-                Name = "Sistema de Gestión de Proyectos Sociales",
-                Description =
-                    "Aplicación para administrar proyectos, actividades y participantes.",
-                RepositoryUrl = "https://github.com/",
-                IsPublished = true
-            },
-
-            new()
-            {
-                Name = "API de Seguimiento",
-                Description =
-                    "API REST para consultar y actualizar información de seguimiento.",
-                RepositoryUrl = "https://github.com/",
-                IsPublished = true
-            },
-
-            new()
-            {
-                Name = "Dashboard de Indicadores",
-                Description =
-                    "Panel para visualizar indicadores y resultados de proyectos.",
-                IsPublished = true
-            }
+            Name = "Sistema de Gestión de Proyectos Sociales",
+            Description = "Aplicación para administrar proyectos, actividades y participantes.",
+            RepositoryUrl = "https://github.com/",
+            IsPublished = true,
+            ProjectSkills =
+            [
+                new ProjectSkill { Skill = csharp },
+                new ProjectSkill { Skill = aspNet },
+                new ProjectSkill { Skill = sqlite }
+            ]
         };
 
-        await context.Projects.AddRangeAsync(projects);
+        var project2 = new Project
+        {
+            Name = "API de Seguimiento",
+            Description = "API REST para consultar y actualizar información de seguimiento.",
+            RepositoryUrl = "https://github.com/",
+            IsPublished = true,
+            ProjectSkills =
+            [
+                new ProjectSkill { Skill = csharp },
+                new ProjectSkill { Skill = aspNet },
+                new ProjectSkill { Skill = rest }
+            ]
+        };
+
+        await context.Projects.AddRangeAsync(project1, project2);
 
         await context.SaveChangesAsync();
     }
