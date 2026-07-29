@@ -18,13 +18,22 @@
 
     </div>
 
-    <div class="row g-4">
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Aún no hay proyectos publicados.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
 
-        @foreach (var project in Model)
-        {
-            <partial name="Partials/_ProjectCard" model="project" />
-        }
+            @foreach (var project in Model)
+            {
+                <partial name="Partials/_ProjectCard" model="project" />
+            }
 
-    </div>
+        </div>
+    }
 
 </div>

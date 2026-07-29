@@ -14,10 +14,10 @@ public class ProjectsController : Controller
     }
 
     [HttpGet("/projects")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
 
-        var projects = _projectService.GetAll();
+        var projects = await _projectService.GetAllAsync();
 
         var viewModels = projects.Select(project =>
             new ProjectCardViewModel
@@ -34,9 +34,9 @@ public class ProjectsController : Controller
     }
 
     [HttpGet("/projects/{id:int}")]
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        var project = _projectService.GetById(id);
+        var project = await _projectService.GetByIdAsync(id);
 
         if (project is null)
         {

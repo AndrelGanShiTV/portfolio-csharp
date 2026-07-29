@@ -1,49 +1,31 @@
+using Microsoft.EntityFrameworkCore;
 using Portfolio.Application.Services;
 using Portfolio.Domain.Entities;
+using Portfolio.Infrastructure.Persistence;
 
 namespace Portfolio.Infrastructure.Services;
 
 public class ProjectService : IProjectService
 {
-    private readonly List<Project> _projects =
-    [
-        new Project
-        {
-            Id = 1,
-            Name = "Sistema de Gestión de Proyectos Sociales",
-            Description =
-                "Aplicación para administrar proyectos, actividades y participantes.",
-            RepositoryUrl = "https://github.com/",
-            IsPublished = true
-        },
+    private readonly AppDbContext _context;
 
-        new Project
-        {
-            Id = 2,
-            Name = "API de Seguimiento",
-            Description =
-                "API REST para consultar y actualizar información de seguimiento.",
-            RepositoryUrl = "https://github.com/",
-            IsPublished = true
-        },
-
-        new Project
-        {
-            Id = 3,
-            Name = "Dashboard de Indicadores",
-            Description =
-                "Panel para visualizar indicadores y resultados de proyectos.",
-            IsPublished = true
-        }
-    ];
-
-    public IEnumerable<Project> GetAll()
+    public ProjectService(AppDbContext context)
     {
-        return _projects;
+        _context = context;
     }
 
-    public Project? GetById(int id)
+    public async Task<IEnumerable<Project>> GetAllAsync()
     {
-        return _projects.FirstOrDefault(project => project.Id == id);
+        return await _context.Projects
+            .Where(project => project.IsPublished)
+            .ToListAsync();
+    }
+
+    public async Task<Project?> GetByIdAsync(int id)
+    {
+        return await _context.Projects
+            .FirstOrDefaultAsync(project =>
+                project.Id == id &&
+                project.IsPublished);
     }
 }

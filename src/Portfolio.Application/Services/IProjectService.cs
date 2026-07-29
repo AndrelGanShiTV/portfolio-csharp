@@ -4,7 +4,7 @@ namespace Portfolio.Application.Services;
 
 public interface IProjectService
 {
-    IEnumerable<Project> GetAll();
+    Task<IEnumerable<Project>> GetAllAsync();
 
-    Project? GetById(int id);
+    Task<Project?> GetByIdAsync(int id);
 }
