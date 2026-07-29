@@ -1,0 +1,84 @@
+@model CreateProjectViewModel
+
+@{
+    ViewData["Title"] = "Crear proyecto";
+}
+
+<div class="container py-5">
+
+    <h1 class="mb-4">
+        Crear proyecto
+    </h1>
+
+    <form asp-action="Create" method="post">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3">
+        </div>
+
+        <div class="mb-3">
+
+            <label asp-for="Name" class="form-label">
+            </label>
+
+            <input asp-for="Name" class="form-control" />
+
+            <span asp-validation-for="Name" class="text-danger">
+            </span>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label asp-for="Description" class="form-label">
+            </label>
+
+            <textarea asp-for="Description" class="form-control" rows="5">
+            </textarea>
+
+            <span asp-validation-for="Description" class="text-danger">
+            </span>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label asp-for="RepositoryUrl" class="form-label">
+            </label>
+
+            <input asp-for="RepositoryUrl" class="form-control" />
+
+            <span asp-validation-for="RepositoryUrl" class="text-danger">
+            </span>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label asp-for="DemoUrl" class="form-label">
+            </label>
+
+            <input asp-for="DemoUrl" class="form-control" />
+
+            <span asp-validation-for="DemoUrl" class="text-danger">
+            </span>
+
+        </div>
+
+        <div class="form-check mb-4">
+
+            <input asp-for="IsPublished" class="form-check-input" />
+
+            <label asp-for="IsPublished" class="form-check-label">
+            </label>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+
+            Guardar proyecto
+
+        </button>
+
+    </form>
+
+</div>

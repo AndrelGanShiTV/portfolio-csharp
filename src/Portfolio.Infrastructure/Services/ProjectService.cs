@@ -32,4 +32,51 @@ public class ProjectService : IProjectService
                 project.Id == id &&
                 project.IsPublished);
     }
+
+    public async Task<Project> CreateAsync(Project project)
+    {
+        _context.Projects.Add(project);
+
+        await _context.SaveChangesAsync();
+
+        return project;
+    }
+
+    public async Task<bool> UpdateAsync(Project project)
+    {
+        var existingProject = await _context.Projects
+            .FirstOrDefaultAsync(x => x.Id == project.Id);
+
+        if (existingProject is null)
+        {
+            return false;
+        }
+
+        existingProject.Name = project.Name;
+        existingProject.Description = project.Description;
+        existingProject.RepositoryUrl = project.RepositoryUrl;
+        existingProject.DemoUrl = project.DemoUrl;
+        existingProject.IsPublished = project.IsPublished;
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(project => project.Id == id);
+
+        if (project is null)
+        {
+            return false;
+        }
+
+        _context.Projects.Remove(project);
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

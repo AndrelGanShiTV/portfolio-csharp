@@ -1,0 +1,49 @@
+@model ProjectCardViewModel
+
+@{
+    ViewData["Title"] = "Eliminar proyecto";
+}
+
+<div class="container py-5">
+
+    <h1 class="text-danger">
+        Eliminar proyecto
+    </h1>
+
+    <div class="alert alert-warning mt-4">
+        Esta acción eliminará permanentemente el proyecto.
+    </div>
+
+    <div class="card mt-4">
+
+        <div class="card-body">
+
+            <h4>
+                @Model.Name
+            </h4>
+
+            <p>
+                @Model.Description
+            </p>
+
+        </div>
+
+    </div>
+
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" class="mt-4">
+
+        <button type="submit" class="btn btn-danger">
+
+            Sí, eliminar
+
+        </button>
+
+        <a asp-controller="Projects" asp-action="Index" class="btn btn-secondary">
+
+            Cancelar
+
+        </a>
+
+    </form>
+
+</div>
