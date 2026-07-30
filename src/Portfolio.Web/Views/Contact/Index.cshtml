@@ -55,6 +55,16 @@
             <span asp-validation-for="Message" class="text-danger"></span>
         </div>
 
+        <div class="visually-hidden" aria-hidden="true">
+            <label asp-for="Website">
+                Sitio Web
+            </label>
+
+            <input asp-for="Website" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <input asp-for="FormLoadedAtUnix" type="hidden" />
+
         <button type="submit" class="btn btn-primary">
             Enviar mensaje
         </button>

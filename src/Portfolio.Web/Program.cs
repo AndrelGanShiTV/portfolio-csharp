@@ -3,6 +3,8 @@ using Portfolio.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,42 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<IExperienceService, ExperienceService>();
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
+
+// Configure rate limiting for the contact form
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode =
+        StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy(
+        policyName: "contact-form",
+        partitioner: httpContext =>
+        {
+            var ipAddress =
+                httpContext.Connection.RemoteIpAddress?.ToString()
+                ?? "unknown";
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: ipAddress,
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 2,
+                    Window = TimeSpan.FromMinutes(30),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                });
+        });
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType =
+            "text/plain; charset=utf-8";
+
+        await context.HttpContext.Response.WriteAsync(
+            "Has enviado demasiados mensajes. Intenta nuevamente en unos minutos.",
+            cancellationToken);
+    };
+});
 
 var app = builder.Build();
 
@@ -74,6 +112,9 @@ app.UseStatusCodePagesWithReExecute("/Error/{0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+// Enable rate limiting middleware
+app.UseRateLimiter();
 
 // Enable authentication and authorization
 app.UseAuthentication();
