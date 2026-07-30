@@ -1,3 +1,8 @@
+@{
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -29,31 +34,36 @@
 
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="nav-link">
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index"
+                               class="nav-link @(currentController == "Home" ? "active" : "")">
                                 Panel
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="Projects" asp-action="Index" class="nav-link">
+                            <a asp-area="Admin" asp-controller="Projects" asp-action="Index"
+                               class="nav-link @(currentController == "Projects" ? "active" : "")">
                                 Proyectos
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="Skills" asp-action="Index" class="nav-link">
+                            <a asp-area="Admin" asp-controller="Skills" asp-action="Index"
+                               class="nav-link @(currentController == "Skills" ? "active" : "")">
                                 Tecnologías
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="Experiences" asp-action="Index" class="nav-link">
+                            <a asp-area="Admin" asp-controller="Experiences" asp-action="Index"
+                               class="nav-link @(currentController == "Experiences" ? "active" : "")">
                                 Experiencia
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="ContactMessages" asp-action="Index" class="nav-link">
+                            <a asp-area="Admin" asp-controller="ContactMessages" asp-action="Index"
+                               class="nav-link @(currentController == "ContactMessages" ? "active" : "")">
                                 Mensajes
                             </a>
                         </li>
