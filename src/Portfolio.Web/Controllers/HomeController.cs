@@ -27,12 +27,6 @@ public class HomeController : Controller
         return View();
     }
 
-    [HttpGet("/contact")]
-    public IActionResult Contact()
-    {
-        return View();
-    }
-
     public async Task<IActionResult> Experience()
     {
         var experiences = await _experienceService.GetAllAsync();

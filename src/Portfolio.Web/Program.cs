@@ -31,6 +31,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<IExperienceService, ExperienceService>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 
 var app = builder.Build();
 

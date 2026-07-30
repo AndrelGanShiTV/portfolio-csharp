@@ -1,0 +1,51 @@
+@model ContactMessageAdminViewModel
+
+@{
+    ViewData["Title"] = "Detalle del mensaje";
+}
+
+<div class="container py-5">
+    <h1>Detalle del mensaje</h1>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Nombre</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Correo</dt>
+                <dd class="col-sm-9">
+                    <a href="mailto:@Model.Email">
+                        @Model.Email
+                    </a>
+                </dd>
+
+                <dt class="col-sm-3">Asunto</dt>
+                <dd class="col-sm-9">@Model.Subject</dd>
+
+                <dt class="col-sm-3">Fecha</dt>
+                <dd class="col-sm-9">
+                    @Model.CreatedAtUtc
+                    .ToLocalTime()
+                    .ToString("dd/MM/yyyy HH:mm")
+                </dd>
+            </dl>
+
+            <hr />
+
+            <p style="white-space: pre-wrap;">
+                @Model.Message
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            Volver
+        </a>
+
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+            Eliminar
+        </a>
+    </div>
+</div>

@@ -64,34 +64,35 @@
 
                         <li class="nav-item">
 
-                            <a class="nav-link" asp-controller="Home" asp-action="Contact">
+                            <a asp-area="" asp-controller="Contact" asp-action="Index" class="nav-link">
                                 Contacto
                             </a>
+                        </a>
 
-                        </li>
+                    </li>
 
-                    </ul>
-
-                </div>
+                </ul>
 
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top py-4 mt-5">
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
 
-        <div class="container text-center text-muted">
-            <p class="mb-0">
-                © @DateTime.Now.Year Andres
-            </p <small>
-            Construido con C# y ASP.NET Core
-        </small>
-    </div>
+<footer class="border-top py-4 mt-5">
+
+    <div class="container text-center text-muted">
+        <p class="mb-0">
+            © @DateTime.Now.Year Andres
+        </p <small>
+        Construido con C# y ASP.NET Core
+    </small>
+</div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,0 +1,84 @@
+@model IEnumerable<ContactMessageAdminViewModel>
+
+@{
+    ViewData["Title"] = "Mensajes de contacto";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <h1>Mensajes de contacto</h1>
+        <p class="text-muted">
+            Revisa los mensajes enviados desde el portafolio.
+        </p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No hay mensajes registrados.
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Nombre</th>
+                            <th>Asunto</th>
+                            <th>Fecha</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var message in Model)
+                        {
+                            <tr class="@(!message.IsRead ? "table-warning" : string.Empty)">
+                                <td>
+                                    @if (message.IsRead)
+                                    {
+                                        <span class="badge text-bg-secondary">
+                                            Leído
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-primary">
+                                            Nuevo
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div>@message.Name</div>
+                                    <small class="text-muted">
+                                        @message.Email
+                                    </small>
+                                </td>
+
+                                <td>@message.Subject</td>
+
+                                <td>
+                                    @message.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </td>
+
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@message.Id" class="btn btn-sm btn-primary">
+                                        Ver
+                                    </a>
+
+                                    <a asp-action="Delete" asp-route-id="@message.Id" class="btn btn-sm btn-danger">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
