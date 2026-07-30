@@ -1,0 +1,64 @@
+@model IEnumerable<ExperienceItemViewModel>
+
+@{
+    ViewData["Title"] = "Experiencia";
+}
+
+<div class="container py-5">
+    <div class="mb-5">
+        <h1>Experiencia profesional</h1>
+        <p class="text-muted">
+            Mi trayectoria, responsabilidades y experiencia laboral.
+        </p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Todavía no hay experiencia profesional registrada.
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-4">
+            @foreach (var experience in Model)
+            {
+                <article class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                            <div>
+                                <h2 class="h4 mb-1">
+                                    @experience.Position
+                                </h2>
+
+                                <h3 class="h6 text-primary mb-3">
+                                    @experience.Company
+                                </h3>
+                            </div>
+
+                            <div class="text-muted">
+                                @experience.StartDate.ToString("MMM yyyy")
+                                —
+
+                                @if (experience.IsCurrent)
+                                {
+                                    <span>Actualidad</span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @experience.EndDate?.ToString("MMM yyyy")
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <p class="mb-0">
+                            @experience.Description
+                        </p>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</div>

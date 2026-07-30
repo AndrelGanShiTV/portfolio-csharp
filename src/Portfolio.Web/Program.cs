@@ -9,23 +9,28 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Configure the database context and identity
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString(
             "DefaultConnection")));
 
+// Configure Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+// Configure application cookie settings
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/account/login";
 });
 
+// Register application services
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
+builder.Services.AddScoped<IExperienceService, ExperienceService>();
 
 var app = builder.Build();
 
@@ -59,14 +64,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Enable HTTPS redirection and routing
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// Enable authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 
+// Map controller routes for areas and default route
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");

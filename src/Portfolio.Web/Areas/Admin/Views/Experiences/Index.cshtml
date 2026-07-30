@@ -1,0 +1,69 @@
+@model IEnumerable<ExperienceViewModel>
+
+@{
+    ViewData["Title"] = "Experiencia profesional";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Experiencia profesional</h1>
+
+        <a asp-area="Admin" asp-controller="Experiences" asp-action="Create" class="btn btn-primary">
+            Nueva experiencia
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Cargo</th>
+                        <th>Periodo</th>
+                        <th>Orden</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var experience in Model)
+                    {
+                        <tr>
+                            <td>@experience.Company</td>
+                            <td>@experience.Position</td>
+
+                            <td>
+                                @experience.StartDate.ToString("MMM yyyy")
+                                —
+
+                                @if (experience.IsCurrent)
+                                {
+                                    <span>Actualidad</span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @experience.EndDate?.ToString("MMM yyyy")
+                                    </span>
+                                }
+                            </td>
+
+                            <td>@experience.DisplayOrder</td>
+
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@experience.Id" class="btn btn-sm btn-warning">
+                                    Editar
+                                </a>
+
+                                <a asp-action="Delete" asp-route-id="@experience.Id" class="btn btn-sm btn-danger">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+@model ExperienceViewModel
+
+@{
+    ViewData["Title"] = "Eliminar experiencia";
+}
+
+<div class="container py-5">
+    <h1 class="text-danger">Eliminar experiencia</h1>
+
+    <p>
+        ¿Seguro que quieres eliminar la experiencia
+        <strong>@Model.Position</strong>
+        en
+        <strong>@Model.Company</strong>?
+    </p>
+
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+
+        <button type="submit" class="btn btn-danger">
+            Sí, eliminar
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>

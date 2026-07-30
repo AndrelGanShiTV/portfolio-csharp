@@ -1,0 +1,22 @@
+@model ExperienceViewModel
+
+@{
+    ViewData["Title"] = "Nueva experiencia";
+}
+
+<div class="container py-5">
+    <h1>Nueva experiencia</h1>
+
+    <form asp-action="Create" method="post" class="mt-4">
+
+        <partial name="_Form" model="Model" />
+
+        <button type="submit" class="btn btn-primary">
+            Guardar
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>
