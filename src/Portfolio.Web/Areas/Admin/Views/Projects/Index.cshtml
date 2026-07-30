@@ -5,19 +5,15 @@
 }
 
 <div class="container py-5">
+    <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+        Volver al panel
+    </a>
 
     <div class="d-flex justify-content-between mb-4">
         <h1>Administrar proyectos</h1>
 
-        <a asp-area="Admin" asp-controller="Projects" asp-action="Create" class="btn btn-primary">
-            Nuevo proyecto
-        </a>
+        <a asp-area="Admin" asp-controller="Projects" asp-action="Create" class="btn btn-primary">Nuevo proyecto</a>
 
-        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-            <button type="submit" class="btn btn-outline-danger">
-                Cerrar sesión
-            </button>
-        </form>
     </div>
 
     @foreach (var project in Model)

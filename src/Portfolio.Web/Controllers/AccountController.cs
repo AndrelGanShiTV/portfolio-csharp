@@ -49,7 +49,7 @@ public class AccountController : Controller
 
         return RedirectToAction(
             "Index",
-            "Projects",
+            "Home",
             new { area = "Admin" });
     }
 
