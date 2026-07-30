@@ -1,4 +1,4 @@
-@model IEnumerable<ContactMessageAdminViewModel>
+@model PagedResultViewModel<ContactMessageAdminViewModel>
 
 @{
     ViewData["Title"] = "Mensajes de contacto";
@@ -12,7 +12,7 @@
         </p>
     </div>
 
-    @if (!Model.Any())
+    @if (!Model.Items.Any())
     {
         <div class="alert alert-info">
             No hay mensajes registrados.
@@ -34,7 +34,7 @@
                     </thead>
 
                     <tbody>
-                        @foreach (var message in Model)
+                        @foreach (var message in Model.Items)
                         {
                             <tr class="@(!message.IsRead ? "table-warning" : string.Empty)">
                                 <td>
@@ -78,6 +78,35 @@
                         }
                     </tbody>
                 </table>
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Paginación de mensajes">
+                        <ul class="pagination justify-content-center">
+
+                            <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                                <a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" class="page-link">
+                                    Anterior
+                                </a>
+                            </li>
+
+                            @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                            {
+                                <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : "")">
+                                    <a asp-action="Index" asp-route-page="@pageNumber" class="page-link">
+                                        @pageNumber
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                                <a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" class="page-link">
+                                    Siguiente
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                }
             </div>
         </div>
     }

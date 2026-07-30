@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.Services;
 using Portfolio.Web.ViewModels.Contact;
+using Portfolio.Web.ViewModels.Common;
 
 namespace Portfolio.Web.Areas.Admin.Controllers;
 
@@ -17,23 +18,38 @@ public class ContactMessagesController : Controller
         _contactMessageService = contactMessageService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var messages = await _contactMessageService.GetAllAsync();
+        const int pageSize = 10;
 
-        var models = messages.Select(message =>
-            new ContactMessageAdminViewModel
+        var result = await _contactMessageService.GetPagedAsync(
+            page,
+            pageSize);
+
+        var items = result.Items
+            .Select(message =>
+                new ContactMessageAdminViewModel
+                {
+                    Id = message.Id,
+                    Name = message.Name,
+                    Email = message.Email,
+                    Subject = message.Subject,
+                    Message = message.Message,
+                    CreatedAtUtc = message.CreatedAtUtc,
+                    IsRead = message.IsRead
+                })
+            .ToList();
+
+        var model =
+            new PagedResultViewModel<ContactMessageAdminViewModel>
             {
-                Id = message.Id,
-                Name = message.Name,
-                Email = message.Email,
-                Subject = message.Subject,
-                Message = message.Message,
-                CreatedAtUtc = message.CreatedAtUtc,
-                IsRead = message.IsRead
-            });
+                Items = items,
+                CurrentPage = result.CurrentPage,
+                TotalPages = result.TotalPages,
+                TotalItems = result.TotalItems
+            };
 
-        return View(models);
+        return View(model);
     }
 
     [HttpGet]

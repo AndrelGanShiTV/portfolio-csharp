@@ -1,4 +1,4 @@
-@model IEnumerable<ProjectCardViewModel>
+@model PagedResultViewModel<ProjectCardViewModel>
 
 @{
     ViewData["Title"] = "Administrar proyectos";
@@ -11,35 +11,98 @@
         <a asp-area="Admin" asp-controller="Projects" asp-action="Create" class="btn btn-primary">Nuevo proyecto</a>
 
     </div>
-
-    @foreach (var project in Model)
+    @if (!Model.Items.Any())
     {
-        <div class="card mb-3">
-            <div class="card-body">
-
-                <h5 class="card-title">@project.Name</h5>
-
-                @if (project.IsPublished)
-                {
-                    <span class="badge text-bg-success">Publicado</span>
-                }
-                else
-                {
-                    <span class="badge text-bg-secondary">Borrador</span>
-                }
-
-                <a asp-area="Admin" asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id"
-                   class="btn btn-warning">
-                    Editar
-                </a>
-
-                <a asp-area="Admin" asp-controller="Projects" asp-action="Delete" asp-route-id="@project.Id"
-                   class="btn btn-danger">
-                    Eliminar
-                </a>
-
-            </div>
+        <div class="alert alert-info">
+            No hay proyectos registrados.
         </div>
     }
+    else
+    {
+        @foreach (var project in Model.Items)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
 
+                    <h5 class="card-title">@project.Name</h5>
+
+                    @if (project.IsPublished)
+                    {
+                        <span class="badge text-bg-success">Publicado</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">Borrador</span>
+                    }
+
+                    <div class="mb-2">
+                        @if (project.Technologies.Any())
+                        {
+                            @foreach (var skill in project.Technologies)
+                            {
+                                <span class="badge text-bg-secondary me-1">
+                                    @skill
+                                </span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                Sin tecnologías asignadas
+                            </span>
+                        }
+                    </div>
+
+                    <a asp-area="Admin" asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id"
+                       class="btn btn-warning">
+                        Editar
+                    </a>
+
+                    <a asp-area="Admin" asp-controller="Projects" asp-action="Delete" asp-route-id="@project.Id"
+                       class="btn btn-danger">
+                        Eliminar
+                    </a>
+
+                </div>
+            </div>
+        }
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <p class="text-muted mb-0">
+                Total de proyectos: @Model.TotalItems
+            </p>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Paginación de proyectos">
+                    <ul class="pagination mb-0">
+
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a asp-area="Admin" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" class="page-link">
+                                Anterior
+                            </a>
+                        </li>
+
+                        @for (
+                            var pageNumber = 1;
+                            pageNumber <= Model.TotalPages;
+                            pageNumber++)
+                        {
+                            <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : "")">
+                                <a asp-area="Admin" asp-action="Index" asp-route-page="@pageNumber" class="page-link">
+                                    @pageNumber
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a asp-area="Admin" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" class="page-link">
+                                Siguiente
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
 </div>

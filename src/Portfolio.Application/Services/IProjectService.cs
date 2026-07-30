@@ -1,10 +1,13 @@
 using Portfolio.Domain.Entities;
+using Portfolio.Application.Common;
 
 namespace Portfolio.Application.Services;
 
 public interface IProjectService
 {
     Task<IEnumerable<Project>> GetAllForAdminAsync();
+
+    Task<PagedResult<Project>> GetPagedForAdminAsync(int page, int pageSize);
 
     Task<IEnumerable<Project>> GetAllAsync();
 

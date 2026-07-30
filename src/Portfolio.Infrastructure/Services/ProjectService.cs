@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Portfolio.Application.Services;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure.Persistence;
+using Portfolio.Application.Common;
 
 namespace Portfolio.Infrastructure.Services;
 
@@ -21,6 +22,42 @@ public class ProjectService : IProjectService
             .ThenInclude(projectSkill => projectSkill.Skill)
             .OrderBy(project => project.Name)
             .ToListAsync();
+    }
+
+    public async Task<PagedResult<Project>> GetPagedForAdminAsync(
+    int page,
+    int pageSize)
+    {
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = _context.Projects
+            .Include(project => project.ProjectSkills)
+                .ThenInclude(projectSkill => projectSkill.Skill)
+            .OrderByDescending(project => project.Id);
+
+        var totalItems = await query.CountAsync();
+
+        var totalPages = (int)Math.Ceiling(
+            totalItems / (double)pageSize);
+
+        if (totalPages > 0 && page > totalPages)
+        {
+            page = totalPages;
+        }
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<Project>
+        {
+            Items = items,
+            CurrentPage = page,
+            TotalPages = totalPages,
+            TotalItems = totalItems
+        };
     }
 
     public async Task<IEnumerable<Project>> GetAllAsync()

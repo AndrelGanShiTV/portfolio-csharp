@@ -4,6 +4,7 @@ using Portfolio.Domain.Entities;
 using Portfolio.Web.ViewModels.Projects;
 using Portfolio.Web.ViewModels.Skills;
 using Microsoft.AspNetCore.Authorization;
+using Portfolio.Web.ViewModels.Common;
 
 namespace Portfolio.Web.Areas.Admin.Controllers;
 
@@ -21,25 +22,40 @@ public class ProjectsController : Controller
         _skillService = skillService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var projects = await _projectService.GetAllForAdminAsync();
+        const int pageSize = 10;
 
-        var viewModels = projects.Select(project =>
-            new ProjectCardViewModel
+        var result = await _projectService.GetPagedForAdminAsync(
+            page,
+            pageSize);
+
+        var items = result.Items
+            .Select(project => new ProjectCardViewModel
             {
                 Id = project.Id,
                 Name = project.Name,
                 Description = project.Description,
                 RepositoryUrl = project.RepositoryUrl,
                 DemoUrl = project.DemoUrl,
+                IsPublished = project.IsPublished,
                 Technologies = project.ProjectSkills
-                    .Select(projectSkill => projectSkill.Skill.Name)
-                    .ToList(),
-                IsPublished = project.IsPublished
-            });
+                    .Select(projectSkill =>
+                        projectSkill.Skill.Name)
+                    .ToList()
+            })
+            .ToList();
 
-        return View(viewModels);
+        var model =
+            new PagedResultViewModel<ProjectCardViewModel>
+            {
+                Items = items,
+                CurrentPage = result.CurrentPage,
+                TotalPages = result.TotalPages,
+                TotalItems = result.TotalItems
+            };
+
+        return View(model);
     }
 
     [HttpGet("/admin/projects/create")]
