@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Portfolio.Web.ViewModels.Skills;
 
 namespace Portfolio.Web.ViewModels.Projects;
 
@@ -21,4 +22,8 @@ public class CreateProjectViewModel
     public string? DemoUrl { get; set; }
 
     public bool IsPublished { get; set; }
+
+    public List<int> SelectedSkillIds { get; set; } = [];
+
+    public List<SkillOptionViewModel> AvailableSkills { get; set; } = [];
 }

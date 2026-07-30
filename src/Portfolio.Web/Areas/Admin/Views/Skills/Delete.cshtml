@@ -1,0 +1,30 @@
+@model SkillViewModel
+
+@{
+    ViewData["Title"] = "Eliminar tecnología";
+}
+
+<div class="container py-5">
+
+    <h1 class="text-danger">
+        Eliminar tecnología
+    </h1>
+
+    <p>
+        ¿Seguro que quieres eliminar
+        <strong>@Model.Name</strong>?
+    </p>
+
+    <form asp-area="Admin" asp-controller="Skills" asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+
+        <button type="submit" class="btn btn-danger">
+            Sí, eliminar
+        </button>
+
+        <a asp-area="Admin" asp-controller="Skills" asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </form>
+
+</div>

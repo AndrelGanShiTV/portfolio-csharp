@@ -25,7 +25,16 @@
         <div class="card mb-3">
             <div class="card-body">
 
-                <h5>@project.Name</h5>
+                <h5 class="card-title">@project.Name</h5>
+
+                @if (project.IsPublished)
+                {
+                    <span class="badge text-bg-success">Publicado</span>
+                }
+                else
+                {
+                    <span class="badge text-bg-secondary">Borrador</span>
+                }
 
                 <a asp-area="Admin" asp-controller="Projects" asp-action="Edit" asp-route-id="@project.Id"
                    class="btn btn-warning">

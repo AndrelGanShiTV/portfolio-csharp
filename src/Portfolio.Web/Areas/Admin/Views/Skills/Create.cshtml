@@ -1,0 +1,40 @@
+@model SkillViewModel
+
+@{
+    ViewData["Title"] = "Nueva tecnología";
+}
+
+<div class="container py-5">
+
+    <h1>Nueva tecnología</h1>
+
+    <form asp-area="Admin" asp-controller="Skills" asp-action="Create" method="post" class="mt-4">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+        </div>
+
+        <div class="mb-3">
+
+            <label asp-for="Name" class="form-label">
+            </label>
+
+            <input asp-for="Name" class="form-control" />
+
+            <span asp-validation-for="Name" class="text-danger">
+            </span>
+
+        </div>
+
+        <button class="btn btn-primary" type="submit">
+            Guardar
+        </button>
+
+        <a asp-area="Admin" asp-controller="Skills" asp-action="Index" class="btn btn-secondary">
+
+            Cancelar
+
+        </a>
+
+    </form>
+
+</div>

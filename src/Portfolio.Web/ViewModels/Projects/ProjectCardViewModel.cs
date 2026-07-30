@@ -13,4 +13,6 @@ public class ProjectCardViewModel
     public string? DemoUrl { get; set; }
 
     public List<string> Technologies { get; set; } = [];
+
+    public bool IsPublished { get; set; }
 }

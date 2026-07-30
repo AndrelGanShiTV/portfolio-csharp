@@ -1,0 +1,73 @@
+@model IEnumerable<SkillViewModel>
+
+@{
+    ViewData["Title"] = "Administrar tecnologías";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h1>Tecnologías</h1>
+
+        <a asp-area="Admin" asp-controller="Skills" asp-action="Create" class="btn btn-primary">
+
+            Nueva tecnología
+
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var skill in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @skill.Name
+                            </td>
+
+                            <td class="text-end">
+
+                                <a asp-area="Admin" asp-controller="Skills" asp-action="Edit" asp-route-id="@skill.Id"
+                                   class="btn btn-sm btn-warning">
+
+                                    Editar
+
+                                </a>
+
+                                <a asp-area="Admin" asp-controller="Skills" asp-action="Delete" asp-route-id="@skill.Id"
+                                   class="btn btn-sm btn-danger">
+
+                                    Eliminar
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

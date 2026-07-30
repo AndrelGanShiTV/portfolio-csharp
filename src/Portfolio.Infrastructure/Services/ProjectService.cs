@@ -14,6 +14,15 @@ public class ProjectService : IProjectService
         _context = context;
     }
 
+    public async Task<IEnumerable<Project>> GetAllForAdminAsync()
+    {
+        return await _context.Projects
+            .Include(project => project.ProjectSkills)
+            .ThenInclude(projectSkill => projectSkill.Skill)
+            .OrderBy(project => project.Name)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Project>> GetAllAsync()
     {
         return await _context.Projects
@@ -21,6 +30,14 @@ public class ProjectService : IProjectService
             .ThenInclude(projectSkill => projectSkill.Skill)
             .Where(project => project.IsPublished)
             .ToListAsync();
+    }
+
+    public async Task<Project?> GetByIdForAdminAsync(int id)
+    {
+        return await _context.Projects
+            .Include(project => project.ProjectSkills)
+                .ThenInclude(projectSkill => projectSkill.Skill)
+            .FirstOrDefaultAsync(project => project.Id == id);
     }
 
     public async Task<Project?> GetByIdAsync(int id)
@@ -42,9 +59,10 @@ public class ProjectService : IProjectService
         return project;
     }
 
-    public async Task<bool> UpdateAsync(Project project)
+    public async Task<bool> UpdateAsync(Project project, IEnumerable<int> selectedSkillIds)
     {
         var existingProject = await _context.Projects
+            .Include(x => x.ProjectSkills)
             .FirstOrDefaultAsync(x => x.Id == project.Id);
 
         if (existingProject is null)
@@ -57,6 +75,32 @@ public class ProjectService : IProjectService
         existingProject.RepositoryUrl = project.RepositoryUrl;
         existingProject.DemoUrl = project.DemoUrl;
         existingProject.IsPublished = project.IsPublished;
+
+        var distinctSkillIds = selectedSkillIds
+            .Distinct()
+            .ToHashSet();
+
+        var relationshipsToRemove = existingProject.ProjectSkills
+            .Where(projectSkill => !distinctSkillIds.Contains(projectSkill.SkillId))
+            .ToList();
+
+        _context.ProjectSkills.RemoveRange(relationshipsToRemove);
+
+        var existingSkillIds = existingProject.ProjectSkills
+            .Select(projectSkill => projectSkill.SkillId)
+            .ToHashSet();
+
+        foreach (var skillId in distinctSkillIds)
+        {
+            if (!existingSkillIds.Contains(skillId))
+            {
+                existingProject.ProjectSkills.Add(new ProjectSkill
+                {
+                    ProjectId = existingProject.Id,
+                    SkillId = skillId
+                });
+            }
+        }
 
         await _context.SaveChangesAsync();
 
