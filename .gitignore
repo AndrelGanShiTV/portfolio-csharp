@@ -29,5 +29,7 @@ Thumbs.db
 *.db-wal
 
 # Environment / secrets
+# .env.*
 .env
+
 appsettings.Development.local.json

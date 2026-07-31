@@ -5,6 +5,7 @@ using Portfolio.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using Portfolio.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,25 +114,39 @@ builder.Services.AddRateLimiter(options =>
 var app = builder.Build();
 
 // Seed the database with initial data
-using (var scope = app.Services.CreateScope())
+await using var scope = app.Services.CreateAsyncScope();
+
+var services = scope.ServiceProvider;
+
+var logger =
+    services.GetRequiredService<ILogger<Program>>();
+
+try
 {
     var context =
-        scope.ServiceProvider
-            .GetRequiredService<AppDbContext>();
+        services.GetRequiredService<AppDbContext>();
 
     var userManager =
-        scope.ServiceProvider
-            .GetRequiredService<UserManager<ApplicationUser>>();
+        services.GetRequiredService<UserManager<ApplicationUser>>();
 
     var roleManager =
-        scope.ServiceProvider
-            .GetRequiredService<RoleManager<IdentityRole>>();
+        services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await context.Database.MigrateAsync();
 
     await DbSeeder.SeedAsync(
         context,
         userManager,
         roleManager,
         builder.Configuration);
+}
+catch (Exception exception)
+{
+    logger.LogCritical(
+        exception,
+        "Database migration or seeding failed.");
+
+    throw;
 }
 
 // Configure the HTTP request pipeline.
@@ -144,7 +159,6 @@ else
 {
     app.UseDeveloperExceptionPage();
 }
-
 app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 // Enable HTTPS redirection, static files, and routing
@@ -159,17 +173,17 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map static assets for the application
 app.MapStaticAssets();
 
 // Map controller routes for areas and default route
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-
+// Run the application
 app.Run();
