@@ -111,6 +111,11 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+// Configure health checks for the application
+builder.Services
+    .AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>();
+
 var app = builder.Build();
 
 // Seed the database with initial data
@@ -184,6 +189,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+// Map health check endpoint
+app.MapHealthChecks("/health");
 
 // Run the application
 app.Run();
