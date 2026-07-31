@@ -11,11 +11,41 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configure the database context and identity
+// Configure the database context
+var databaseProvider =
+    builder.Configuration["DatabaseProvider"]
+    ?? throw new InvalidOperationException(
+        "DatabaseProvider is not configured.");
+
+var connectionString =
+    builder.Configuration.GetConnectionString(
+        "DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "DefaultConnection is not configured.");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(
-        builder.Configuration.GetConnectionString(
-            "DefaultConnection")));
+{
+    switch (databaseProvider.ToLowerInvariant())
+    {
+        case "sqlite":
+            options.UseSqlite(connectionString,
+                sqliteOptions =>
+                    sqliteOptions.MigrationsAssembly(
+                        "Portfolio.Migrations.Sqlite"));
+            break;
+
+        case "postgresql":
+            options.UseNpgsql(connectionString,
+                postgreSqlOptions =>
+                    postgreSqlOptions.MigrationsAssembly(
+                        "Portfolio.Migrations.PostgreSql"));
+            break;
+
+        default:
+            throw new InvalidOperationException(
+                $"Unsupported database provider: {databaseProvider}");
+    }
+});
 
 // Configure Identity
 builder.Services
