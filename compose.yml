@@ -33,7 +33,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
 
       DatabaseProvider: postgresql
 

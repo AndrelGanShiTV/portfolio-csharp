@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Portfolio.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Portfolio.Domain.Entities;
 
@@ -116,6 +117,19 @@ builder.Services
     .AddHealthChecks()
     .AddDbContextCheck<AppDbContext>();
 
+// Configure forwarded headers for reverse proxy scenarios
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
+
+    options.ForwardLimit = 1;
+
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
 
 // Seed the database with initial data
@@ -153,6 +167,9 @@ catch (Exception exception)
 
     throw;
 }
+
+// Enable forwarded headers middleware
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
