@@ -35,8 +35,8 @@ public class AccountController : Controller
             .PasswordSignInAsync(
                 model.Email,
                 model.Password,
-                model.RememberMe,
-                lockoutOnFailure: false);
+                isPersistent: false,
+                lockoutOnFailure: true);
 
         if (!result.Succeeded)
         {

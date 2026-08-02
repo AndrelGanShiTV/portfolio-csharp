@@ -3,17 +3,51 @@ using Portfolio.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
+using Portfolio.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configure the database context and identity
+// Configure the database context
+var databaseProvider =
+    builder.Configuration["DatabaseProvider"]
+    ?? throw new InvalidOperationException(
+        "DatabaseProvider is not configured.");
+
+var connectionString =
+    builder.Configuration.GetConnectionString(
+        "DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "DefaultConnection is not configured.");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(
-        builder.Configuration.GetConnectionString(
-            "DefaultConnection")));
+{
+    switch (databaseProvider.ToLowerInvariant())
+    {
+        case "sqlite":
+            options.UseSqlite(connectionString,
+                sqliteOptions =>
+                    sqliteOptions.MigrationsAssembly(
+                        "Portfolio.Migrations.Sqlite"));
+            break;
+
+        case "postgresql":
+            options.UseNpgsql(connectionString,
+                postgreSqlOptions =>
+                    postgreSqlOptions.MigrationsAssembly(
+                        "Portfolio.Migrations.PostgreSql"));
+            break;
+
+        default:
+            throw new InvalidOperationException(
+                $"Unsupported database provider: {databaseProvider}");
+    }
+});
 
 // Configure Identity
 builder.Services
@@ -24,7 +58,16 @@ builder.Services
 // Configure application cookie settings
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/account/login";
+    options.Cookie.Name = "Portfolio.Admin.Auth";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+
+    options.LoginPath = "/account/Login";
+    options.AccessDeniedPath = "/account/AccessDenied";
 });
 
 // Register application services
@@ -33,22 +76,82 @@ builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<IExperienceService, ExperienceService>();
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 
+// Configure rate limiting for the contact form
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode =
+        StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy(
+        policyName: "contact-form",
+        partitioner: httpContext =>
+        {
+            var ipAddress =
+                httpContext.Connection.RemoteIpAddress?.ToString()
+                ?? "unknown";
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: ipAddress,
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 2,
+                    Window = TimeSpan.FromMinutes(30),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                });
+        });
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType =
+            "text/plain; charset=utf-8";
+
+        await context.HttpContext.Response.WriteAsync(
+            "Has enviado demasiados mensajes. Intenta nuevamente en unos minutos.",
+            cancellationToken);
+    };
+});
+
+// Configure health checks for the application
+builder.Services
+    .AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>();
+
+// Configure forwarded headers for reverse proxy scenarios
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
+
+    options.ForwardLimit = 1;
+
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
 
 // Seed the database with initial data
-using (var scope = app.Services.CreateScope())
+await using var scope = app.Services.CreateAsyncScope();
+
+var services = scope.ServiceProvider;
+
+var logger =
+    services.GetRequiredService<ILogger<Program>>();
+
+try
 {
     var context =
-        scope.ServiceProvider
-            .GetRequiredService<AppDbContext>();
+        services.GetRequiredService<AppDbContext>();
 
     var userManager =
-        scope.ServiceProvider
-            .GetRequiredService<UserManager<ApplicationUser>>();
+        services.GetRequiredService<UserManager<ApplicationUser>>();
 
     var roleManager =
-        scope.ServiceProvider
-            .GetRequiredService<RoleManager<IdentityRole>>();
+        services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await context.Database.MigrateAsync();
 
     await DbSeeder.SeedAsync(
         context,
@@ -56,34 +159,56 @@ using (var scope = app.Services.CreateScope())
         roleManager,
         builder.Configuration);
 }
+catch (Exception exception)
+{
+    logger.LogCritical(
+        exception,
+        "Database migration or seeding failed.");
+
+    throw;
+}
+
+// Enable forwarded headers middleware
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/Error/500");
     app.UseHsts();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
-// Enable HTTPS redirection and routing
+// Enable HTTPS redirection, static files, and routing
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
+
+// Enable rate limiting middleware
+app.UseRateLimiter();
 
 // Enable authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map static assets for the application
 app.MapStaticAssets();
 
 // Map controller routes for areas and default route
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+// Map health check endpoint
+app.MapHealthChecks("/health");
 
+// Run the application
 app.Run();

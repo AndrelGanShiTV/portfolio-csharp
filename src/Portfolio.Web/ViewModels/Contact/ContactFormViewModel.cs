@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Portfolio.Web.ViewModels.Contact;
 
@@ -24,4 +25,10 @@ public class ContactFormViewModel
     [StringLength(3000)]
     [Display(Name = "Mensaje")]
     public string Message { get; set; } = string.Empty;
+
+    [ValidateNever]
+    public string? Website { get; set; } = string.Empty;
+
+    [ValidateNever]
+    public long FormLoadedAtUnix { get; set; }
 }

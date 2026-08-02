@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Portfolio.Infrastructure.Migrations
+namespace Portfolio.Migrations.Sqlite.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

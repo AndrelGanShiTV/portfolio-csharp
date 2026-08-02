@@ -1,0 +1,57 @@
+name: Portfolio CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore Portfolio.slnx
+
+      - name: Build solution
+        run: >
+          dotnet build Portfolio.slnx
+          --configuration Release
+          --no-restore
+
+      - name: Run tests
+        run: >
+          dotnet test tests/Portfolio.UnitTests/Portfolio.UnitTests.csproj
+          --configuration Release
+          --no-build
+          --verbosity normal
+
+  docker-build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: >
+          docker build
+          --tag portfolio-web:ci
+          .
