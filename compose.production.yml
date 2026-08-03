@@ -1,0 +1,16 @@
+services:
+  postgres:
+    restart: always
+
+  web:
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+  caddy:
+    restart: always
+    environment:
+      DOMAIN: ${DOMAIN}
+
+    volumes:
+      - ./Caddyfile.production:/etc/caddy/Caddyfile:ro
