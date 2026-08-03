@@ -38,6 +38,15 @@ public class AccountController : Controller
                 isPersistent: false,
                 lockoutOnFailure: true);
 
+        if (result.IsLockedOut)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "La cuenta ha sido bloqueada debido a múltiples intentos fallidos. Por favor, inténtelo de nuevo nunca jamas, gracias.");
+
+            return View(model);
+        }
+
         if (!result.Succeeded)
         {
             ModelState.AddModelError(

@@ -82,7 +82,8 @@ public static class DbSeeder
             {
                 UserName = adminEmail,
                 Email = adminEmail,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                LockoutEnabled = true
             };
 
             var result = await userManager.CreateAsync(
@@ -98,6 +99,10 @@ public static class DbSeeder
                 throw new InvalidOperationException(
                     $"No se pudo crear el usuario administrador: {errors}");
             }
+        }
+        else if (!await userManager.GetLockoutEnabledAsync(adminUser))
+        {
+            await userManager.SetLockoutEnabledAsync(adminUser, true);
         }
 
         if (!await userManager.IsInRoleAsync(adminUser, adminRole))
