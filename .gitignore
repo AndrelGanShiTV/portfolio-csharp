@@ -34,3 +34,8 @@ Thumbs.db
 .env.production
 
 appsettings.Development.local.json
+
+#Backups and temporary files
+*.bak
+backups/
+*.dump
