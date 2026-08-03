@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Portfolio.Application.Services;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure.Persistence;
+using Portfolio.Application.Common;
 
 namespace Portfolio.Infrastructure.Services;
 
@@ -20,6 +21,39 @@ public class ContactMessageService : IContactMessageService
             .OrderBy(message => message.IsRead)
             .ThenByDescending(message => message.CreatedAtUtc)
             .ToListAsync();
+    }
+
+    public async Task<PagedResult<ContactMessage>> GetPagedAsync(int page, int pageSize)
+    {
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = _context.ContactMessages
+            .OrderBy(message => message.IsRead)
+            .ThenByDescending(message => message.CreatedAtUtc);
+
+        var totalItems = await query.CountAsync();
+
+        var totalPages = (int)Math.Ceiling(
+            totalItems / (double)pageSize);
+
+        if (totalPages > 0 && page > totalPages)
+        {
+            page = totalPages;
+        }
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<ContactMessage>
+        {
+            Items = items,
+            CurrentPage = page,
+            TotalPages = totalPages,
+            TotalItems = totalItems
+        };
     }
 
     public async Task<ContactMessage?> GetByIdAsync(int id)

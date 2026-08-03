@@ -1,0 +1,91 @@
+@{
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Portfolio</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="navbar-brand">
+                    Portfolio Admin
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#adminNavigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div id="adminNavigation" class="collapse navbar-collapse">
+
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index"
+                               class="nav-link @(currentController == "Home" ? "active" : "")">
+                                Panel
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Projects" asp-action="Index"
+                               class="nav-link @(currentController == "Projects" ? "active" : "")">
+                                Proyectos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Skills" asp-action="Index"
+                               class="nav-link @(currentController == "Skills" ? "active" : "")">
+                                Tecnologías
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Experiences" asp-action="Index"
+                               class="nav-link @(currentController == "Experiences" ? "active" : "")">
+                                Experiencia
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="ContactMessages" asp-action="Index"
+                               class="nav-link @(currentController == "ContactMessages" ? "active" : "")">
+                                Mensajes
+                            </a>
+                        </li>
+                    </ul>
+
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+
+                        <button type="submit" class="btn btn-outline-light">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync(
+        "Scripts",
+        required: false)
+</body>
+
+</html>

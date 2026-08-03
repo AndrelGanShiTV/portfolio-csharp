@@ -7,7 +7,7 @@ using Portfolio.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace Portfolio.Infrastructure.Migrations
+namespace Portfolio.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260729123715_InitialCreate")]

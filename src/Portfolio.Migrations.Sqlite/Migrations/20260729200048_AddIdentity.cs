@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Portfolio.Infrastructure.Migrations
+namespace Portfolio.Migrations.Sqlite.Migrations
 {
     /// <inheritdoc />
     public partial class AddIdentity : Migration

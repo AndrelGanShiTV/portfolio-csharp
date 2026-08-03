@@ -29,5 +29,13 @@ Thumbs.db
 *.db-wal
 
 # Environment / secrets
+# .env.*
 .env
+.env.production
+
 appsettings.Development.local.json
+
+#Backups and temporary files
+*.bak
+backups/
+*.dump
