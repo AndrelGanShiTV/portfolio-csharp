@@ -33,14 +33,31 @@ public sealed class RequestLoggingMiddleware
         {
             stopwatch.Stop();
 
-            _logger.LogInformation(
-                "HTTP request completed. Method={Method} Path={Path} StatusCode={StatusCode} ElapsedMilliseconds={ElapsedMilliseconds} ClientIp={ClientIp} CorrelationId={CorrelationId}",
-                context.Request.Method,
-                context.Request.Path.Value,
-                context.Response.StatusCode,
-                stopwatch.Elapsed.TotalMilliseconds,
-                context.Connection.RemoteIpAddress?.ToString(),
-                context.TraceIdentifier);
+            var statusCode = context.Response.StatusCode;
+
+            if (statusCode is StatusCodes.Status401Unauthorized
+                or StatusCodes.Status403Forbidden)
+            {
+                _logger.LogWarning(
+                    "Security response completed. Method={Method} Path={Path} StatusCode={StatusCode} ElapsedMilliseconds={ElapsedMilliseconds} ClientIp={ClientIp} CorrelationId={CorrelationId}",
+                    context.Request.Method,
+                    context.Request.Path.Value,
+                    statusCode,
+                    stopwatch.Elapsed.TotalMilliseconds,
+                    context.Connection.RemoteIpAddress?.ToString(),
+                    context.TraceIdentifier);
+            }
+            else
+            {
+                _logger.LogInformation(
+                    "HTTP request completed. Method={Method} Path={Path} StatusCode={StatusCode} ElapsedMilliseconds={ElapsedMilliseconds} ClientIp={ClientIp} CorrelationId={CorrelationId}",
+                    context.Request.Method,
+                    context.Request.Path.Value,
+                    statusCode,
+                    stopwatch.Elapsed.TotalMilliseconds,
+                    context.Connection.RemoteIpAddress?.ToString(),
+                    context.TraceIdentifier);
+            }
         }
     }
 

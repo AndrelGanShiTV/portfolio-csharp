@@ -144,9 +144,22 @@ builder.Services.AddRateLimiter(options =>
 
     options.OnRejected = async (context, cancellationToken) =>
     {
-        context.HttpContext.Response.ContentType = "text/plain";
+        var httpContext = context.HttpContext;
 
-        await context.HttpContext.Response.WriteAsync(
+        var logger = httpContext.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("Security.RateLimiting");
+
+        logger.LogWarning(
+            "Rate limit rejected. Method={Method} Path={Path} ClientIp={ClientIp} CorrelationId={CorrelationId}",
+            httpContext.Request.Method,
+            httpContext.Request.Path.Value,
+            httpContext.Connection.RemoteIpAddress?.ToString(),
+            httpContext.TraceIdentifier);
+
+        httpContext.Response.ContentType = "text/plain";
+
+        await httpContext.Response.WriteAsync(
             "Demasiados intentos de inicio de sesión. Por favor, inténtelo de nuevo más tarde.",
             cancellationToken);
     };
