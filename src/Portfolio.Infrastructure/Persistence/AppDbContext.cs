@@ -16,8 +16,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Skill> Skills => Set<Skill>();
     public DbSet<ProjectSkill> ProjectSkills => Set<ProjectSkill>();
     public DbSet<Experience> Experiences => Set<Experience>();
-
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

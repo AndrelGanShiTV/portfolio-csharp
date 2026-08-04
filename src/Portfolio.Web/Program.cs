@@ -7,6 +7,8 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Portfolio.Domain.Entities;
+using Portfolio.Application.Abstractions;
+using Portfolio.Infrastructure.Auditing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,11 +72,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/account/AccessDenied";
 });
 
+// Add HttpContextAccessor for accessing HTTP context in services
+builder.Services.AddHttpContextAccessor();
+
 // Register application services
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<IExperienceService, ExperienceService>();
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
+builder.Services.AddScoped<IAuditLogger, AuditLogger>();
 
 // Configure rate limiting for the contact form
 builder.Services.AddRateLimiter(options =>
