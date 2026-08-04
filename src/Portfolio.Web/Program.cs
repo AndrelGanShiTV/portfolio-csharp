@@ -10,6 +10,8 @@ using Portfolio.Domain.Entities;
 using Portfolio.Application.Abstractions;
 using Portfolio.Infrastructure.Auditing;
 using Portfolio.Web.Middleware;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -153,7 +155,13 @@ builder.Services.AddRateLimiter(options =>
 // Configure health checks for the application
 builder.Services
     .AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>();
+    .AddCheck(
+        name: "application",
+        check: () => HealthCheckResult.Healthy(),
+        tags: ["live"])
+    .AddDbContextCheck<AppDbContext>(
+        name: "database",
+        tags: ["ready"]);
 
 // Configure forwarded headers for reverse proxy scenarios
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -257,8 +265,21 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Map health check endpoint
+// Map health check endpoints for liveness and readiness probes
 app.MapHealthChecks("/health");
+app.MapHealthChecks(
+    "/health/live",
+    new HealthCheckOptions
+    {
+        Predicate = check => check.Tags.Contains("live")
+    });
+
+app.MapHealthChecks(
+    "/health/ready",
+    new HealthCheckOptions
+    {
+        Predicate = check => check.Tags.Contains("ready")
+    });
 
 // Run the application
 app.Run();
