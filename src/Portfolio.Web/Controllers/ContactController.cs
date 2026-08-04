@@ -3,17 +3,21 @@ using Portfolio.Application.Services;
 using Portfolio.Domain.Entities;
 using Portfolio.Web.ViewModels.Contact;
 using Microsoft.AspNetCore.RateLimiting;
+using Portfolio.Application.Abstractions;
 
 namespace Portfolio.Web.Controllers;
 
 public class ContactController : Controller
 {
     private readonly IContactMessageService _contactMessageService;
+    private readonly IAuditLogger _auditLogger;
 
     public ContactController(
-        IContactMessageService contactMessageService)
+        IContactMessageService contactMessageService,
+        IAuditLogger auditLogger)
     {
         _contactMessageService = contactMessageService;
+        _auditLogger = auditLogger;
     }
 
     [HttpGet]
@@ -71,6 +75,13 @@ public class ContactController : Controller
         };
 
         await _contactMessageService.CreateAsync(message);
+
+        await _auditLogger.WriteAsync(
+            action: "ContactMessageCreated",
+            succeeded: true,
+            resourceType: "ContactMessage",
+            resourceId: message.Id.ToString(),
+            details: $"ContactMessage ID:{message.Id} ha sido creada");
 
         TempData["ContactSuccess"] =
             "Tu mensaje fue enviado correctamente.";

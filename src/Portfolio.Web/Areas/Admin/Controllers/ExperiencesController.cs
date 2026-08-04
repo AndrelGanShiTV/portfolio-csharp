@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.Services;
 using Portfolio.Domain.Entities;
 using Portfolio.Web.ViewModels.Experiences;
+using Portfolio.Application.Abstractions;
 
 namespace Portfolio.Web.Areas.Admin.Controllers;
 
@@ -11,11 +12,14 @@ namespace Portfolio.Web.Areas.Admin.Controllers;
 public class ExperiencesController : Controller
 {
     private readonly IExperienceService _experienceService;
+    private readonly IAuditLogger _auditLogger;
 
     public ExperiencesController(
-        IExperienceService experienceService)
+        IExperienceService experienceService,
+        IAuditLogger auditLogger)
     {
         _experienceService = experienceService;
+        _auditLogger = auditLogger;
     }
 
     public async Task<IActionResult> Index()
@@ -63,6 +67,13 @@ public class ExperiencesController : Controller
 
         await _experienceService.CreateAsync(experience);
 
+        await _auditLogger.WriteAsync(
+            action: "ExperienceCreated",
+            succeeded: true,
+            resourceType: "Experience",
+            resourceId: experience.Id.ToString(),
+            details: $"Experience ID:{experience.Id} - '{experience.Position}' ha sido creada");
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -102,6 +113,13 @@ public class ExperiencesController : Controller
         var updated = await _experienceService.UpdateAsync(
             MapToEntity(model));
 
+        await _auditLogger.WriteAsync(
+            action: "ExperienceUpdated",
+            succeeded: true,
+            resourceType: "Experience",
+            resourceId: model.Id.ToString(),
+            details: $"Experience ID:{model.Id} - '{model.Position}' ha sido actualizada");
+
         if (!updated)
         {
             return NotFound();
@@ -127,7 +145,15 @@ public class ExperiencesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
+        var experience = await _experienceService.GetByIdAsync(id);
         var deleted = await _experienceService.DeleteAsync(id);
+
+        await _auditLogger.WriteAsync(
+            action: "ExperienceDeleted",
+            succeeded: true,
+            resourceType: "Experience",
+            resourceId: id.ToString(),
+            details: $"Experience ID:{id} - '{experience?.Position}' ha sido eliminada");
 
         if (!deleted)
         {

@@ -5,6 +5,7 @@ using Portfolio.Web.ViewModels.Projects;
 using Portfolio.Web.ViewModels.Skills;
 using Microsoft.AspNetCore.Authorization;
 using Portfolio.Web.ViewModels.Common;
+using Portfolio.Application.Abstractions;
 
 namespace Portfolio.Web.Areas.Admin.Controllers;
 
@@ -14,12 +15,15 @@ public class ProjectsController : Controller
 {
     private readonly IProjectService _projectService;
     private readonly ISkillService _skillService;
+    private readonly IAuditLogger _auditLogger;
     public ProjectsController(
     IProjectService projectService,
-    ISkillService skillService)
+    ISkillService skillService,
+    IAuditLogger auditLogger)
     {
         _projectService = projectService;
         _skillService = skillService;
+        _auditLogger = auditLogger;
     }
 
     public async Task<IActionResult> Index(int page = 1)
@@ -99,6 +103,13 @@ public class ProjectsController : Controller
 
         await _projectService.CreateAsync(project);
 
+        await _auditLogger.WriteAsync(
+            action: "ProjectCreated",
+            succeeded: true,
+            resourceType: "Project",
+            resourceId: project.Id.ToString(),
+            details: $"El proyecto {project.Id}::{project.Name} ha sido creado.");
+
         return RedirectToAction(
             actionName: nameof(Index),
             controllerName: "Projects",
@@ -163,6 +174,13 @@ public class ProjectsController : Controller
 
         var updated = await _projectService.UpdateAsync(project, model.SelectedSkillIds);
 
+        await _auditLogger.WriteAsync(
+            action: "ProjectUpdated",
+            succeeded: true,
+            resourceType: "Project",
+            resourceId: project.Id.ToString(),
+            details: $"El proyecto {project.Id}::{project.Name} ha sido actualizado.");
+
         if (!updated)
         {
             return NotFound();
@@ -203,12 +221,20 @@ public class ProjectsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
+        var project = await _projectService.GetByIdForAdminAsync(id);
         var deleted = await _projectService.DeleteAsync(id);
 
         if (!deleted)
         {
             return NotFound();
         }
+
+        await _auditLogger.WriteAsync(
+            action: "ProjectDeleted",
+            succeeded: true,
+            resourceType: "Project",
+            resourceId: id.ToString(),
+            details: $"El proyecto {project?.Id}::{project?.Name} ha sido eliminado.");
 
         return RedirectToAction(
             actionName: nameof(Index),

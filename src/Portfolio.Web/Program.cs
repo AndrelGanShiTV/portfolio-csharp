@@ -7,6 +7,11 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Portfolio.Domain.Entities;
+using Portfolio.Application.Abstractions;
+using Portfolio.Infrastructure.Auditing;
+using Portfolio.Web.Middleware;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,11 +75,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/account/AccessDenied";
 });
 
+// Add HttpContextAccessor for accessing HTTP context in services
+builder.Services.AddHttpContextAccessor();
+
 // Register application services
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<IExperienceService, ExperienceService>();
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
+builder.Services.AddScoped<IAuditLogger, AuditLogger>();
 
 // Configure rate limiting for the contact form
 builder.Services.AddRateLimiter(options =>
@@ -112,10 +121,60 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+// Configure rate limiting for the admin login
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("admin-login", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: clientIp,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        var httpContext = context.HttpContext;
+
+        var logger = httpContext.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("Security.RateLimiting");
+
+        logger.LogWarning(
+            "Rate limit rejected. Method={Method} Path={Path} ClientIp={ClientIp} CorrelationId={CorrelationId}",
+            httpContext.Request.Method,
+            httpContext.Request.Path.Value,
+            httpContext.Connection.RemoteIpAddress?.ToString(),
+            httpContext.TraceIdentifier);
+
+        httpContext.Response.ContentType = "text/plain";
+
+        await httpContext.Response.WriteAsync(
+            "Demasiados intentos de inicio de sesión. Por favor, inténtelo de nuevo más tarde.",
+            cancellationToken);
+    };
+});
+
 // Configure health checks for the application
 builder.Services
     .AddHealthChecks()
-    .AddDbContextCheck<AppDbContext>();
+    .AddCheck(
+        name: "application",
+        check: () => HealthCheckResult.Healthy(),
+        tags: ["live"])
+    .AddDbContextCheck<AppDbContext>(
+        name: "database",
+        tags: ["ready"]);
 
 // Configure forwarded headers for reverse proxy scenarios
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -128,6 +187,14 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
+});
+
+// Configure Identity options for account lockout
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 });
 
 var app = builder.Build();
@@ -171,6 +238,10 @@ catch (Exception exception)
 // Enable forwarded headers middleware
 app.UseForwardedHeaders();
 
+// Enable custom middleware for correlation ID and request logging
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -207,8 +278,21 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Map health check endpoint
+// Map health check endpoints for liveness and readiness probes
 app.MapHealthChecks("/health");
+app.MapHealthChecks(
+    "/health/live",
+    new HealthCheckOptions
+    {
+        Predicate = check => check.Tags.Contains("live")
+    });
+
+app.MapHealthChecks(
+    "/health/ready",
+    new HealthCheckOptions
+    {
+        Predicate = check => check.Tags.Contains("ready")
+    });
 
 // Run the application
 app.Run();
