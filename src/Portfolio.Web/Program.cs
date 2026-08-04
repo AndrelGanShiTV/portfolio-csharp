@@ -112,6 +112,37 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+// Configure rate limiting for the admin login
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("admin-login", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: clientIp,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "text/plain";
+
+        await context.HttpContext.Response.WriteAsync(
+            "Demasiados intentos de inicio de sesión. Por favor, inténtelo de nuevo más tarde.",
+            cancellationToken);
+    };
+});
+
 // Configure health checks for the application
 builder.Services
     .AddHealthChecks()
@@ -134,8 +165,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Lockout.AllowedForNewUsers = true;
-    options.Lockout.MaxFailedAccessAttempts = 3;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 });
 
 var app = builder.Build();

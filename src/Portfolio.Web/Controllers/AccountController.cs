@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Portfolio.Infrastructure.Persistence;
 using Portfolio.Web.ViewModels.Account;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Portfolio.Web.Controllers;
 
@@ -23,6 +24,7 @@ public class AccountController : Controller
 
     [HttpPost("/account/login")]
     [ValidateAntiForgeryToken]
+    [EnableRateLimiting("admin-login")]
     public async Task<IActionResult> Login(
         LoginViewModel model)
     {
