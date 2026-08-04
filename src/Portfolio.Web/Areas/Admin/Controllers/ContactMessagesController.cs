@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.Services;
 using Portfolio.Web.ViewModels.Contact;
 using Portfolio.Web.ViewModels.Common;
+using Portfolio.Application.Abstractions;
 
 namespace Portfolio.Web.Areas.Admin.Controllers;
 
@@ -11,11 +12,14 @@ namespace Portfolio.Web.Areas.Admin.Controllers;
 public class ContactMessagesController : Controller
 {
     private readonly IContactMessageService _contactMessageService;
+    private readonly IAuditLogger _auditLogger;
 
     public ContactMessagesController(
-        IContactMessageService contactMessageService)
+        IContactMessageService contactMessageService,
+        IAuditLogger auditLogger)
     {
         _contactMessageService = contactMessageService;
+        _auditLogger = auditLogger;
     }
 
     public async Task<IActionResult> Index(int page = 1)
@@ -65,6 +69,12 @@ public class ContactMessagesController : Controller
         if (!message.IsRead)
         {
             await _contactMessageService.MarkAsReadAsync(id);
+            await _auditLogger.WriteAsync(
+                action: "ContactMessageMarkedAsRead",
+                succeeded: true,
+                resourceType: "ContactMessage",
+                resourceId: message.Id.ToString(),
+                details: $"ContactMessage ID:{id} ha sido marcada como leída");
             message.IsRead = true;
         }
 
@@ -111,6 +121,13 @@ public class ContactMessagesController : Controller
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var deleted = await _contactMessageService.DeleteAsync(id);
+
+        await _auditLogger.WriteAsync(
+            action: "ContactMessageDeleted",
+            succeeded: true,
+            resourceType: "ContactMessage",
+            resourceId: id.ToString(),
+            details: $"ContactMessage ID:{id} ha sido eliminada");
 
         if (!deleted)
         {

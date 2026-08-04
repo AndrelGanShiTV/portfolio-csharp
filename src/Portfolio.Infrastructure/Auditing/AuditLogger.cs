@@ -47,10 +47,7 @@ public sealed class AuditLogger : IAuditLogger
             ResourceType = resourceType,
             ResourceId = resourceId,
 
-            IpAddress = httpContext?
-                .Connection
-                .RemoteIpAddress?
-                .ToString(),
+            IpAddress = GetClientIpAddress(httpContext),
 
             Succeeded = succeeded,
             Details = NormalizeDetails(details)
@@ -73,5 +70,15 @@ public sealed class AuditLogger : IAuditLogger
         return normalizedDetails.Length <= 1000
             ? normalizedDetails
             : normalizedDetails[..1000];
+    }
+
+    private static string? GetClientIpAddress(HttpContext? httpContext)
+    {
+        if (httpContext is null)
+        {
+            return null;
+        }
+
+        return httpContext.Connection.RemoteIpAddress?.ToString();
     }
 }

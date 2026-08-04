@@ -87,6 +87,11 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        await _auditLogger.WriteAsync(
+            action: "AdminLogout",
+            succeeded: true,
+            details: "Cierre de sesión de administrador exitoso.");
+
         await _signInManager.SignOutAsync();
 
         return RedirectToAction(
