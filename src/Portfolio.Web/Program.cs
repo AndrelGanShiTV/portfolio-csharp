@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Portfolio.Domain.Entities;
 using Portfolio.Application.Abstractions;
 using Portfolio.Infrastructure.Auditing;
+using Portfolio.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -215,6 +216,10 @@ catch (Exception exception)
 
 // Enable forwarded headers middleware
 app.UseForwardedHeaders();
+
+// Enable custom middleware for correlation ID and request logging
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
